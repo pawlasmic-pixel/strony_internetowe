@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Wirus gugugaga.exe</title>
+
+    <style>
+
+        body{
+            margin: 0;
+            background: linear-gradient(to bottom, rgb(82,0,0), rgb(20,0,0));
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        #naglowek{
+            background-color: rgb(255, 0, 0);
+            padding: 35px;
+            box-shadow: 0px 0px 25px red;
+        }
+
+        #naglowek h1{
+            margin: 0;
+            font-size: 45px;
+            letter-spacing: 3px;
+            color: white;
+            text-shadow: 3px 3px 10px black;
+        }
+        
+        #download{
+            text-align: center;
+            background: green;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 24px;
+
+
+        }
+
+        #WirusZdjencie{
+            margin-top: 40px;
+        }
+
+        #img{
+            width: 400px;
+            border-radius: 25px;
+            box-shadow: 0px 0px 30px black;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        #img:hover{
+            transform: scale(1.05);
+        }
+
+        /* fullscreen */
+        #img.full{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            background: black;
+            z-index: 9999;
+            transform: none;
+        }
+
+        #instrukcja{
+            margin-top: 50px;
+        }
+
+        #instr{
+            font-size: 40px;
+            background: red;
+            color: white;
+            text-decoration: none;
+            padding: 20px 50px;
+            border-radius: 20px;
+            box-shadow: 0px 0px 20px red;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        #instr:hover{
+            background: rgb(255, 80, 80);
+            transform: scale(1.1);
+        }
+
+    </style>
+
+</head>
+<body>
+
+    </a>
+    <div id="naglowek"> 
+        <h1>
+            dostań wirusa gugugaga.exe za darmo już dziś
+        </h1>
+    </div>
+
+    <div id="WirusZdjencie">
+        <img src="WirusZdjencie.jpg" id="img" onclick="toggleFull()">
+    </div>
+    <div id="instrukcja">
+
+        <a href="strona2.html" id="instr">
+            instrukcja
+        </a>
+
+    <br><br>
+
+        <a href="https://drive.google.com/uc?export=download&id=1CSnmyHx0L7EQYfaDyia6R7ZKcRsfln4k" download id="download">
+            Pobierz plik v1
+        </a>
+
+    </div>
+    
+    <script>
+        function toggleFull(){
+            document.getElementById("img").classList.toggle("full");
+        }
+    </script>
+
+</body>
+</html>
