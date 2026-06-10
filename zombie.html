@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Zombie Survival V2</title>
+<style>
+body{margin:0;background:#0b1220;color:white;font-family:Arial;text-align:center}
+canvas{background:#111827;display:block;margin:auto}
+button{padding:10px;margin:5px}
+</style>
+</head>
+<body>
+
+<h1>🧟 Zombie Survival V2</h1>
+
+<p>
+HP: <span id="hp">10</span> |
+Ammo: <span id="ammo">12</span> |
+Wave: <span id="wave">1</span> |
+Money: <span id="money">0</span>
+</p>
+
+<button onclick="reload()">🔄 Reload</button>
+<button onclick="upgrade()">💰 Upgrade DMG</button>
+
+<canvas id="c" width="800" height="400"></canvas>
+
+<script>
+const c=document.getElementById("c");
+const ctx=c.getContext("2d");
+
+let hp=10;
+let ammo=12;
+let money=0;
+let wave=1;
+
+let dmg=1;
+
+let zombies=[];
+
+function spawnWave(){
+let count=3 + wave*2;
+
+for(let i=0;i<count;i++){
+zombies.push({
+x:800+i*40,
+hp:2+wave,
+speed:0.6+wave*0.05,
+boss:false
+});
+}
+
+// boss co 5 fal
+if(wave%5===0){
+zombies.push({
+x:900,
+hp:20+wave*3,
+speed:0.4,
+boss:true
+});
+}
+
+wave++;
+document.getElementById("wave").innerText=wave;
+}
+
+setInterval(()=>spawnWave(),8000);
+
+function shoot(){
+if(ammo<=0) return;
+ammo--;
+document.getElementById("ammo").innerText=ammo;
+
+for(let z of zombies){
+if(z.x<150){
+z.hp-=dmg;
+break;
+}
+}
+}
+
+function reload(){
+ammo=12;
+document.getElementById("ammo").innerText=ammo;
+}
+
+function upgrade(){
+if(money>=5){
+money-=5;
+dmg++;
+document.getElementById("money").innerText=money;
+}
+}
+
+function loop(){
+ctx.clearRect(0,0,800,400);
+
+// player
+ctx.fillStyle="cyan";
+ctx.fillRect(100,180,20,40);
+
+// zombies
+for(let i=zombies.length-1;i>=0;i--){
+let z=zombies[i];
+
+z.x-=z.speed;
+
+ctx.fillStyle=z.boss?"purple":"green";
+ctx.fillRect(z.x,180,20,40);
+
+if(z.x<120){
+hp--;
+document.getElementById("hp").innerText=hp;
+zombies.splice(i,1);
+
+if(hp<=0){
+alert("Przegrana!");
+location.reload();
+}
+}
+
+if(z.hp<=0){
+money+=z.boss?10:2;
+document.getElementById("money").innerText=money;
+zombies.splice(i,1);
+}
+}
+
+requestAnimationFrame(loop);
+}
+
+document.addEventListener("click",shoot);
+
+spawnWave();
+loop();
+</script>
+
+</body>
+</html>

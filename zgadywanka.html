@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Zgadywanka</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    color:white;
+    text-align:center;
+}
+
+.container{
+    margin-top:80px;
+    background:rgba(255,255,255,0.15);
+    width:500px;
+    margin-left:auto;
+    margin-right:auto;
+    padding:30px;
+    border-radius:25px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 30px rgba(0,0,0,0.3);
+}
+
+h1{
+    font-size:45px;
+}
+
+input{
+    width:150px;
+    padding:12px;
+    font-size:22px;
+    text-align:center;
+    border:none;
+    border-radius:12px;
+}
+
+button{
+    padding:12px 25px;
+    font-size:20px;
+    border:none;
+    border-radius:12px;
+    background:#22c55e;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.1);
+}
+
+#wynik{
+    margin-top:20px;
+    font-size:28px;
+    font-weight:bold;
+}
+
+#proby{
+    margin-top:10px;
+    font-size:20px;
+}
+
+.powrot{
+    display:inline-block;
+    margin-top:25px;
+    color:white;
+    text-decoration:none;
+    font-size:20px;
+}
+
+.powrot:hover{
+    text-decoration:underline;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🎲 Zgadnij liczbę!</h1>
+
+    <p>Wylosowałem liczbę od 1 do 100</p>
+
+    <input id="liczba" type="number" min="1" max="100">
+
+    <br><br>
+
+    <button onclick="sprawdz()">
+        Sprawdź
+    </button>
+
+    <p id="wynik"></p>
+
+    <p id="proby">
+        Próby: 0
+    </p>
+
+    <a href="przegladarkowe.html" class="powrot">
+        ⬅ Powrót
+    </a>
+
+</div>
+
+<script>
+
+let sekret = Math.floor(Math.random()*100)+1;
+let proby = 0;
+
+function sprawdz(){
+
+    let liczba = Number(
+        document.getElementById("liczba").value
+    );
+
+    proby++;
+
+    document.getElementById("proby").innerText =
+        "Próby: " + proby;
+
+    if(liczba < sekret){
+
+        wynik.innerHTML = "📉 Za mało!";
+
+    }
+    else if(liczba > sekret){
+
+        wynik.innerHTML = "📈 Za dużo!";
+
+    }
+    else{
+
+        wynik.innerHTML =
+        "🎉 Wygrałeś w " + proby + " próbach!";
+
+        document.body.style.background =
+        "linear-gradient(135deg,#16a34a,#22c55e)";
+    }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏰 Tower Defense</title>
+
+    <link rel="stylesheet" href="towerdefense.css">
+</head>
+<body>
+
+<header>
+
+    <h1>🏰 Ultimate Tower Defense</h1>
+
+</header>
+
+<div id="topBar">
+
+    <div class="stat">
+        💰 Złoto:
+        <span id="gold">100</span>
+    </div>
+
+    <div class="stat">
+        ❤️ Życia:
+        <span id="hp">20</span>
+    </div>
+
+    <div class="stat">
+        🌊 Fala:
+        <span id="wave">1</span>
+    </div>
+
+    <div class="stat">
+        👾 Zabici:
+        <span id="kills">0</span>
+    </div>
+
+</div>
+
+<div id="mainLayout">
+
+    <aside id="shop">
+
+        <h2>🛒 Sklep</h2>
+
+        <button class="shopBtn" data-type="archer">
+            🏹 Łucznik
+            <br>
+            Koszt: 50
+        </button>
+
+        <button class="shopBtn" data-type="cannon">
+            💣 Armata
+            <br>
+            Koszt: 120
+        </button>
+
+        <button class="shopBtn" data-type="ice">
+            ❄️ Lodowa
+            <br>
+            Koszt: 100
+        </button>
+
+        <button class="shopBtn" data-type="tesla">
+            ⚡ Tesla
+            <br>
+            Koszt: 200
+        </button>
+
+        <button class="shopBtn" data-type="fire">
+            🔥 Ognista
+            <br>
+            Koszt: 250
+        </button>
+
+        <button class="shopBtn" data-type="poison">
+            ☠️ Trucizna
+            <br>
+            Koszt: 180
+        </button>
+
+        <button class="shopBtn" data-type="mine">
+            💥 Mina
+            <br>
+            Koszt: 30
+        </button>
+
+        <hr>
+
+        <button id="startWave">
+            ▶ Rozpocznij Falę
+        </button>
+
+    </aside>
+
+    <main id="gameArea">
+
+        <canvas
+            id="gameCanvas"
+            width="1000"
+            height="600">
+        </canvas>
+
+    </main>
+
+    <aside id="towerPanel">
+
+        <h2>🎯 Informacje</h2>
+
+        <div id="towerInfo">
+
+            <p>Nazwa:</p>
+            <p id="towerName">
+                Brak wybranej
+            </p>
+
+            <p>Poziom:</p>
+            <p id="towerLevel">
+                -
+            </p>
+
+            <p>Obrażenia:</p>
+            <p id="towerDamage">
+                -
+            </p>
+
+            <p>Zasięg:</p>
+            <p id="towerRange">
+                -
+            </p>
+
+        </div>
+
+        <button id="upgradeBtn">
+            ⬆️ Ulepsz
+        </button>
+
+        <button id="sellBtn">
+            💰 Sprzedaj
+        </button>
+
+        <hr>
+
+        <h2>📈 Statystyki</h2>
+
+        <p>
+            Rekord fali:
+            <span id="recordWave">0</span>
+        </p>
+
+        <p>
+            Najwięcej zabójstw:
+            <span id="recordKills">0</span>
+        </p>
+
+    </aside>
+
+</div>
+
+<footer>
+
+    <a href="przegladarkowe.html">
+        ⬅ Powrót do wyboru gier
+    </a>
+
+</footer>
+
+<script src="towerdefense.js"></script>
+
+</body>
+</html>
