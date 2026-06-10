@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Runner V3 PRO</title>
+
+<style>
+body{
+margin:0;
+background:#0b1220;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+canvas{
+background:#111827;
+display:block;
+margin:auto;
+border:2px solid #334155;
+}
+
+#ui{
+padding:10px;
+font-size:18px;
+}
+
+button{
+padding:10px 15px;
+margin:5px;
+}
+</style>
+</head>
+<body>
+
+<h1>🏃 Runner V3 PRO</h1>
+
+<div id="ui">
+Score: <span id="score">0</span> |
+Coins: <span id="coins">0</span> |
+Speed: <span id="speed">4</span>
+</div>
+
+<canvas id="c" width="800" height="300"></canvas>
+
+<p>
+Sterowanie: SPACE = skok | SHIFT = slide
+</p>
+
+<script>
+const c=document.getElementById("c");
+const ctx=c.getContext("2d");
+
+let player={
+x:80,
+y:240,
+vy:0,
+ground:true,
+slide:false,
+w:20,
+h:40
+};
+
+let score=0;
+let coins=0;
+let speed=4;
+
+let obs=[];
+
+function spawn(){
+let r=Math.random();
+
+let type="block";
+if(r>0.7) type="spike";
+if(r>0.9) type="pit";
+
+obs.push({
+x:800,
+type:type
+});
+}
+
+setInterval(spawn,1400);
+
+// INPUT
+document.addEventListener("keydown",e=>{
+if(e.code==="Space") jump();
+if(e.code==="ShiftLeft") slide();
+});
+
+function jump(){
+if(player.ground){
+player.vy=-12;
+player.ground=false;
+}
+}
+
+function slide(){
+player.slide=true;
+setTimeout(()=>player.slide=false,400);
+}
+
+function update(){
+
+// GRAVITY
+player.vy+=0.6;
+player.y+=player.vy;
+
+if(player.y>=240){
+player.y=240;
+player.vy=0;
+player.ground=true;
+}
+
+// SPEED
+speed+=0.002;
+score+=1;
+
+// OBSTACLES
+for(let i=obs.length-1;i>=0;i--){
+let o=obs[i];
+o.x-=speed;
+
+// collision zone
+let hitX = o.x<110 && o.x>70;
+
+// BLOCK
+if(o.type==="block"){
+ctx.fillStyle="orange";
+ctx.fillRect(o.x,240,30,40);
+
+if(hitX && !player.slide) die();
+}
+
+// SPIKE
+if(o.type==="spike"){
+ctx.fillStyle="red";
+ctx.fillRect(o.x,260,30,20);
+
+if(hitX && player.y>230) die();
+}
+
+// PIT
+if(o.type==="pit"){
+ctx.fillStyle="black";
+ctx.fillRect(o.x,280,50,20);
+
+if(hitX && player.y>=240) die();
+}
+
+// remove
+if(o.x<-100){
+obs.splice(i,1);
+coins++;
+}
+}
+
+document.getElementById("score").innerText=Math.floor(score/10);
+document.getElementById("coins").innerText=coins;
+document.getElementById("speed").innerText=speed.toFixed(1);
+}
+
+function draw(){
+
+ctx.clearRect(0,0,800,300);
+
+// ground
+ctx.fillStyle="#1f2937";
+ctx.fillRect(0,280,800,20);
+
+// player
+ctx.fillStyle="cyan";
+
+if(player.slide){
+ctx.fillRect(player.x,player.y+20,30,20);
+}else{
+ctx.fillRect(player.x,player.y,20,40);
+}
+}
+
+function loop(){
+update();
+draw();
+requestAnimationFrame(loop);
+}
+
+function die(){
+alert("💀 Game Over!");
+location.reload();
+}
+
+loop();
+</script>
+
+</body>
+</html>

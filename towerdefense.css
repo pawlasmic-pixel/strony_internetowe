@@ -1,0 +1,338 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:
+    linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b
+    );
+
+    color:white;
+
+    font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+    min-height:100vh;
+}
+
+header{
+    text-align:center;
+
+    padding:20px;
+
+    background:
+    linear-gradient(
+        90deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    box-shadow:
+    0 0 20px rgba(0,0,0,.4);
+}
+
+header h1{
+    font-size:42px;
+}
+
+#topBar{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    padding:20px;
+}
+
+.stat{
+
+    background:#1e293b;
+
+    border:2px solid #334155;
+
+    border-radius:15px;
+
+    padding:15px;
+
+    min-width:180px;
+
+    text-align:center;
+
+    font-size:20px;
+}
+
+#mainLayout{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:flex-start;
+
+    gap:20px;
+
+    padding:20px;
+}
+
+#shop{
+
+    width:240px;
+
+    background:#1e293b;
+
+    border:2px solid #334155;
+
+    border-radius:20px;
+
+    padding:15px;
+}
+
+#shop h2{
+
+    text-align:center;
+
+    margin-bottom:15px;
+}
+
+.shopBtn{
+
+    width:100%;
+
+    margin-bottom:10px;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#334155;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.25s;
+}
+
+.shopBtn:hover{
+
+    transform:scale(1.05);
+
+    background:#475569;
+}
+
+#startWave{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    background:#22c55e;
+
+    color:white;
+
+    margin-top:10px;
+}
+
+#startWave:hover{
+
+    transform:scale(1.05);
+}
+
+#gameArea{
+
+    display:flex;
+
+    justify-content:center;
+}
+
+#gameCanvas{
+
+    background:#65a30d;
+
+    border:5px solid white;
+
+    border-radius:15px;
+
+    box-shadow:
+    0 0 30px rgba(0,0,0,.5);
+}
+
+#towerPanel{
+
+    width:260px;
+
+    background:#1e293b;
+
+    border:2px solid #334155;
+
+    border-radius:20px;
+
+    padding:15px;
+}
+
+#towerPanel h2{
+
+    text-align:center;
+
+    margin-bottom:15px;
+}
+
+#towerInfo{
+
+    background:#0f172a;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+}
+
+#towerInfo p{
+
+    margin-bottom:8px;
+}
+
+#upgradeBtn{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    background:#22c55e;
+
+    color:white;
+
+    font-size:16px;
+
+    margin-bottom:10px;
+}
+
+#sellBtn{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    background:#ef4444;
+
+    color:white;
+
+    font-size:16px;
+}
+
+#upgradeBtn:hover,
+#sellBtn:hover{
+
+    transform:scale(1.04);
+}
+
+footer{
+
+    text-align:center;
+
+    margin:30px;
+}
+
+footer a{
+
+    color:#60a5fa;
+
+    text-decoration:none;
+
+    font-size:20px;
+}
+
+footer a:hover{
+
+    text-decoration:underline;
+}
+
+hr{
+
+    border:none;
+
+    height:2px;
+
+    background:#334155;
+
+    margin:15px 0;
+}
+
+/* Pasek przewijania */
+
+::-webkit-scrollbar{
+
+    width:10px;
+}
+
+::-webkit-scrollbar-track{
+
+    background:#1e293b;
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#475569;
+
+    border-radius:20px;
+}
+
+/* Telefon */
+
+@media(max-width:1400px){
+
+    #mainLayout{
+
+        flex-direction:column;
+
+        align-items:center;
+    }
+
+    #shop,
+    #towerPanel{
+
+        width:90%;
+    }
+
+    #gameCanvas{
+
+        width:95%;
+        height:auto;
+    }
+}
