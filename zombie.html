@@ -2,138 +2,377 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Zombie Survival V2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧟 Zombie Survival</title>
+
 <style>
-body{margin:0;background:#0b1220;color:white;font-family:Arial;text-align:center}
-canvas{background:#111827;display:block;margin:auto}
-button{padding:10px;margin:5px}
+body{
+    margin:0;
+    background:#111827;
+    color:white;
+    font-family:Arial,sans-serif;
+    text-align:center;
+}
+
+h1{
+    margin:10px;
+}
+
+#ui{
+    margin-bottom:10px;
+    font-size:20px;
+}
+
+canvas{
+    border:3px solid #334155;
+    background:#1f2937;
+}
 </style>
 </head>
 <body>
 
-<h1>🧟 Zombie Survival V2</h1>
+<h1>🧟 Zombie Survival</h1>
 
-<p>
-HP: <span id="hp">10</span> |
-Ammo: <span id="ammo">12</span> |
-Wave: <span id="wave">1</span> |
-Money: <span id="money">0</span>
-</p>
+<div id="ui">
+❤️ HP: <span id="hp">100</span>
+ |
+🏆 Punkty: <span id="score">0</span>
+ |
+🌊 Fala: <span id="wave">1</span>
+</div>
 
-<button onclick="reload()">🔄 Reload</button>
-<button onclick="upgrade()">💰 Upgrade DMG</button>
-
-<canvas id="c" width="800" height="400"></canvas>
+<canvas id="game" width="1000" height="600"></canvas>
 
 <script>
-const c=document.getElementById("c");
-const ctx=c.getContext("2d");
 
-let hp=10;
-let ammo=12;
-let money=0;
-let wave=1;
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-let dmg=1;
+const playerImg = new Image();
+playerImg.src = "ludzik.png";
 
-let zombies=[];
+const keys = {};
 
-function spawnWave(){
-let count=3 + wave*2;
+let score = 0;
+let wave = 1;
 
-for(let i=0;i<count;i++){
-zombies.push({
-x:800+i*40,
-hp:2+wave,
-speed:0.6+wave*0.05,
-boss:false
+let mouseX = 0;
+let mouseY = 0;
+
+let canShoot = true;
+
+const bullets = [];
+const zombies = [];
+
+const player = {
+    x:500,
+    y:300,
+    width:64,
+    height:64,
+    speed:4,
+    hp:100
+};
+
+// ===== STEROWANIE =====
+
+document.addEventListener("keydown",e=>{
+    keys[e.key.toLowerCase()] = true;
 });
-}
 
-// boss co 5 fal
-if(wave%5===0){
-zombies.push({
-x:900,
-hp:20+wave*3,
-speed:0.4,
-boss:true
+document.addEventListener("keyup",e=>{
+    keys[e.key.toLowerCase()] = false;
 });
-}
 
-wave++;
-document.getElementById("wave").innerText=wave;
-}
+canvas.addEventListener("mousemove",e=>{
+    mouseX = e.offsetX;
+    mouseY = e.offsetY;
+});
 
-setInterval(()=>spawnWave(),8000);
+// ===== STRZELANIE =====
+
+canvas.addEventListener("click",shoot);
 
 function shoot(){
-if(ammo<=0) return;
-ammo--;
-document.getElementById("ammo").innerText=ammo;
 
-for(let z of zombies){
-if(z.x<150){
-z.hp-=dmg;
-break;
-}
-}
-}
+    if(!canShoot) return;
 
-function reload(){
-ammo=12;
-document.getElementById("ammo").innerText=ammo;
-}
+    canShoot = false;
 
-function upgrade(){
-if(money>=5){
-money-=5;
-dmg++;
-document.getElementById("money").innerText=money;
-}
-}
+    setTimeout(()=>{
+        canShoot = true;
+    },500);
 
-function loop(){
-ctx.clearRect(0,0,800,400);
+    const startX = player.x + player.width/2;
+    const startY = player.y + player.height/2;
 
-// player
-ctx.fillStyle="cyan";
-ctx.fillRect(100,180,20,40);
+    const dx = mouseX - startX;
+    const dy = mouseY - startY;
 
-// zombies
-for(let i=zombies.length-1;i>=0;i--){
-let z=zombies[i];
+    const dist = Math.hypot(dx,dy);
 
-z.x-=z.speed;
-
-ctx.fillStyle=z.boss?"purple":"green";
-ctx.fillRect(z.x,180,20,40);
-
-if(z.x<120){
-hp--;
-document.getElementById("hp").innerText=hp;
-zombies.splice(i,1);
-
-if(hp<=0){
-alert("Przegrana!");
-location.reload();
-}
+    bullets.push({
+        x:startX,
+        y:startY,
+        vx:(dx/dist)*10,
+        vy:(dy/dist)*10,
+        damage:25
+    });
 }
 
-if(z.hp<=0){
-money+=z.boss?10:2;
-document.getElementById("money").innerText=money;
-zombies.splice(i,1);
-}
+// ===== ZOMBIE =====
+
+function spawnZombie(){
+
+    let side = Math.floor(Math.random()*4);
+
+    let x,y;
+
+    if(side===0){
+        x=0;
+        y=Math.random()*600;
+    }
+    else if(side===1){
+        x=1000;
+        y=Math.random()*600;
+    }
+    else if(side===2){
+        x=Math.random()*1000;
+        y=0;
+    }
+    else{
+        x=Math.random()*1000;
+        y=600;
+    }
+
+    zombies.push({
+        x,
+        y,
+        hp:1,
+        speed:1 + wave*0.05,
+        size:40
+    });
 }
 
-requestAnimationFrame(loop);
+setInterval(spawnZombie,1200);
+
+// ===== UPDATE =====
+
+function updatePlayer(){
+
+    if(keys["w"]) player.y -= player.speed;
+    if(keys["s"]) player.y += player.speed;
+    if(keys["a"]) player.x -= player.speed;
+    if(keys["d"]) player.x += player.speed;
+
+    player.x = Math.max(
+        0,
+        Math.min(
+            canvas.width-player.width,
+            player.x
+        )
+    );
+
+    player.y = Math.max(
+        0,
+        Math.min(
+            canvas.height-player.height,
+            player.y
+        )
+    );
 }
 
-document.addEventListener("click",shoot);
+function updateZombies(){
 
-spawnWave();
-loop();
+    for(let i=zombies.length-1;i>=0;i--){
+
+        const z = zombies[i];
+
+        const dx = player.x - z.x;
+        const dy = player.y - z.y;
+
+        const dist = Math.hypot(dx,dy);
+
+        z.x += (dx/dist)*z.speed;
+        z.y += (dy/dist)*z.speed;
+
+        if(dist < 40){
+
+            player.hp -= 0.15;
+
+            if(player.hp <= 0){
+
+                alert(
+                    "💀 Przegrałeś!\n\nWynik: "
+                    + score
+                );
+
+                location.reload();
+            }
+        }
+    }
+}
+
+function updateBullets(){
+
+    for(let i=bullets.length-1;i>=0;i--){
+
+        const b = bullets[i];
+
+        b.x += b.vx;
+        b.y += b.vy;
+
+        let remove = false;
+
+        for(let j=zombies.length-1;j>=0;j--){
+
+            const z = zombies[j];
+
+            const dist = Math.hypot(
+                b.x-z.x,
+                b.y-z.y
+            );
+
+            if(dist < 25){
+
+                z.hp -= b.damage;
+
+                remove = true;
+
+                if(z.hp <= 0){
+
+                    zombies.splice(j,1);
+
+                    score++;
+
+                    if(score % 10 === 0){
+
+                        wave++;
+
+                    }
+                }
+
+                break;
+            }
+        }
+
+        if(
+            remove ||
+            b.x < 0 ||
+            b.y < 0 ||
+            b.x > canvas.width ||
+            b.y > canvas.height
+        ){
+            bullets.splice(i,1);
+        }
+    }
+}
+
+// ===== RYSOWANIE =====
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    // gracz
+
+    if(playerImg.complete){
+
+        ctx.drawImage(
+            playerImg,
+            player.x,
+            player.y,
+            player.width,
+            player.height
+        );
+
+    }else{
+
+        ctx.fillStyle="cyan";
+
+        ctx.fillRect(
+            player.x,
+            player.y,
+            player.width,
+            player.height
+        );
+    }
+
+    // zombie
+
+    for(const z of zombies){
+
+        ctx.fillStyle="#22c55e";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            z.x,
+            z.y,
+            z.size/2,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+    }
+
+    // pociski
+
+    ctx.fillStyle="yellow";
+
+    for(const b of bullets){
+
+        ctx.beginPath();
+
+        ctx.arc(
+            b.x,
+            b.y,
+            5,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+    }
+}
+
+function updateUI(){
+
+    document.getElementById("hp")
+        .textContent =
+        Math.floor(player.hp);
+
+    document.getElementById("score")
+        .textContent =
+        score;
+
+    document.getElementById("wave")
+        .textContent =
+        wave;
+}
+
+function gameLoop(){
+
+    updatePlayer();
+    updateZombies();
+    updateBullets();
+
+    draw();
+    updateUI();
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+
 </script>
-
+<p></p>
+<a href="przegladarkowe.html">⬅ Powrót</a>
 </body>
 </html>
+
