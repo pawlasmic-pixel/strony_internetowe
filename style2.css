@@ -1,0 +1,26 @@
+body{
+    margin:0;
+    font-family:Arial;
+    background:#050914;
+    color:white;
+    text-align:center;
+}
+
+h1{
+    color:#38bdf8;
+}
+
+canvas{
+    display:block;
+    margin:auto;
+    background:#0b1220;
+    border:2px solid #334155;
+}
+
+button{
+    padding:10px 15px;
+    margin:5px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+}

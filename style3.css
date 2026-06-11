@@ -1,0 +1,22 @@
+body{
+    margin:0;
+    background:black;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+canvas{
+    display:block;
+    margin:auto;
+    background:url("https://i.imgur.com/8QfQw7L.jpg");
+    background-size:cover;
+    border:2px solid #333;
+}
+
+#ui{
+    position:absolute;
+    top:5px;
+    left:10px;
+    font-size:18px;
+}
