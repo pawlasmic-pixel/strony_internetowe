@@ -2,22 +2,22 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Arena PRO AI V2</title>
+<title>NEON SURVIVOR</title>
 
 <style>
 body{
 margin:0;
-background:#0b1220;
+background:#050816;
 color:white;
 font-family:Arial;
 text-align:center;
 }
 
 canvas{
-background:#111827;
+background:#0b1025;
 display:block;
 margin:auto;
-border:2px solid #334155;
+border:2px solid #1e293b;
 }
 
 #ui{
@@ -28,17 +28,17 @@ font-size:18px;
 </head>
 <body>
 
-<h1>⚔️ Arena PRO AI V2</h1>
+<h1>⚡ NEON SURVIVOR</h1>
 
 <div id="ui">
 HP: <span id="hp">100</span> |
-AI HP: <span id="ai">100</span> |
-Mana: <span id="mana">100</span>
+LVL: <span id="lvl">1</span> |
+XP: <span id="xp">0</span>
 </div>
 
 <canvas id="c" width="800" height="400"></canvas>
 
-<p>WASD = ruch | 1-4 = skille</p>
+<p>WASD = ruch | unikaj i przetrwaj fale 👾</p>
 
 <script>
 const c=document.getElementById("c");
@@ -46,32 +46,21 @@ const ctx=c.getContext("2d");
 
 // PLAYER
 let p={
-x:100,y:200,
+x:400,y:200,
 hp:100,
-mana:100,
+lvl:1,
+xp:0,
 cd:0
 };
 
-// AI
-let ai={
-x:600,y:200,
-hp:100,
-cd:0,
-dir:1
-};
+// ENEMIES
+let enemies=[];
 
-let fireTick=0;
-
-// INPUT
 let keys={};
 
+// INPUT
 document.addEventListener("keydown",e=>{
 keys[e.key.toLowerCase()]=true;
-
-if(e.key==="1") attack();
-if(e.key==="2") shield();
-if(e.key==="3") dash();
-if(e.key==="4") fire();
 });
 
 document.addEventListener("keyup",e=>{
@@ -80,119 +69,121 @@ keys[e.key.toLowerCase()]=false;
 
 // MOVE
 function move(){
-
 if(keys["w"]) p.y-=3;
 if(keys["s"]) p.y+=3;
 if(keys["a"]) p.x-=3;
 if(keys["d"]) p.x+=3;
 
-// clamp
-p.x=Math.max(20,Math.min(780,p.x));
-p.y=Math.max(20,Math.min(380,p.y));
+p.x=Math.max(10,Math.min(790,p.x));
+p.y=Math.max(10,Math.min(390,p.y));
 }
 
-// SKILLS
+// SPAWN ENEMY
+function spawn(){
+enemies.push({
+x:Math.random()*800,
+y:Math.random()*400,
+hp:20 + p.lvl*5,
+speed:1 + p.lvl*0.1
+});
+}
 
+// PLAYER AUTO ATTACK
 function attack(){
 
-if(distance(p,ai)<60){
-ai.hp-=10;
-}
-}
+if(p.cd>0) return;
+p.cd=20;
 
-function shield(){
-p.mana-=10;
-p.hp+=5;
-if(p.hp>100) p.hp=100;
-}
-
-function dash(){
-p.x+=40;
-if(distance(p,ai)<80){
-ai.hp-=15;
-}
-}
-
-function fire(){
-if(p.mana<20) return;
-
-p.mana-=20;
-ai.fire=3;
-ai.fireTimer=180;
-}
-
-// AI
-
-function aiLogic(){
-
-let dx=p.x-ai.x;
-let dy=p.y-ai.y;
-
-let dist=Math.sqrt(dx*dx+dy*dy);
-
-// chase
-ai.x+=dx/dist*1.5;
-ai.y+=dy/dist*1.5;
-
-// attack
-if(dist<50 && ai.cd<=0){
-p.hp-=8;
-ai.cd=60;
-}
-
-if(ai.cd>0) ai.cd--;
-
-// fire effect
-if(ai.fireTimer>0){
-ai.fireTimer--;
-
-if(ai.fireTimer%30===0){
-ai.hp-=2;
+for(let e of enemies){
+let d=Math.hypot(e.x-p.x,e.y-p.y);
+if(d<120){
+e.hp-=10;
 }
 }
 }
 
-// UTIL
+// ENEMY AI
+function enemyAI(e){
+let dx=p.x-e.x;
+let dy=p.y-e.y;
+let d=Math.hypot(dx,dy)||1;
 
-function distance(a,b){
-return Math.hypot(a.x-b.x,a.y-b.y);
+e.x+=dx/d*e.speed;
+e.y+=dy/d*e.speed;
+
+// damage player
+if(d<18){
+p.hp-=0.5;
+}
+}
+
+// XP SYSTEM
+function gainXP(){
+p.xp++;
+
+if(p.xp>100){
+p.xp=0;
+p.lvl++;
+p.hp=100;
+}
 }
 
 // LOOP
+let tick=0;
 
 function loop(){
 
 ctx.clearRect(0,0,800,400);
 
 move();
-aiLogic();
 
-// regen mana
-p.mana+=0.2;
-if(p.mana>100) p.mana=100;
+// attack cooldown
+if(p.cd>0) p.cd--;
+attack();
+
+// spawn waves
+tick++;
+if(tick%60===0){
+spawn();
+}
+
+// update enemies
+for(let i=enemies.length-1;i>=0;i--){
+enemyAI(enemies[i]);
+
+if(enemies[i].hp<=0){
+enemies.splice(i,1);
+p.xp+=10;
+}
+}
+
+// XP + regen
+gainXP();
 
 // draw player
 ctx.fillStyle="cyan";
-ctx.fillRect(p.x,p.y,20,20);
+ctx.beginPath();
+ctx.arc(p.x,p.y,10,0,Math.PI*2);
+ctx.fill();
 
-// draw AI
+// draw enemies
 ctx.fillStyle="red";
-ctx.fillRect(ai.x,ai.y,20,20);
+for(let e of enemies){
+ctx.beginPath();
+ctx.arc(e.x,e.y,8,0,Math.PI*2);
+ctx.fill();
+}
 
-// win/lose
+// UI
+document.getElementById("hp").innerText=Math.floor(p.hp);
+document.getElementById("lvl").innerText=p.lvl;
+document.getElementById("xp").innerText=p.xp;
+
+// lose
 if(p.hp<=0){
 alert("Przegrałeś!");
 location.reload();
 }
-
-if(ai.hp<=0){
-alert("Wygrałeś!");
-location.reload();
-}
-
-document.getElementById("hp").innerText=Math.floor(p.hp);
-document.getElementById("ai").innerText=Math.floor(ai.hp);
-document.getElementById("mana").innerText=Math.floor(p.mana);
 
 requestAnimationFrame(loop);
 }
