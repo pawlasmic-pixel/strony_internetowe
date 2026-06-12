@@ -1,138 +1,214 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let money = 500;   // 🔥 START
-let total = 0;
-let speed = 1;
+let score = 0;
+let lives = 3;
 
-const machines = [];
-const items = [];
+let startTime = Date.now();
+let gameWon = false;
 
-const types = {
-    basic: { color:"#22c55e", rate:180, value:5 },
-    iron:  { color:"#60a5fa", rate:120, value:15 },
-    gold:  { color:"#facc15", rate:80, value:40 }
+let player = {
+    x: 500,
+    y: 550,
+    w: 40,
+    h: 40
 };
 
-// 🏭 maszyna
-class Machine{
-    constructor(x,y,type){
-        this.x = x;
-        this.y = y;
-        this.type = type;
-        this.timer = 0;
-    }
+let bullets = [];
+let enemies = [];
 
-    update(){
-        this.timer++;
+let cols = 10;
+let rows = 5;
 
-        if(this.timer > types[this.type].rate / speed){
-            this.timer = 0;
+let high = localStorage.getItem("hs") || 0;
 
-            items.push({
-                x:this.x+25,
-                y:this.y+25,
-                vx:3,
-                value:types[this.type].value,
-                color:types[this.type].color
-            });
-        }
-    }
+document.getElementById("hs").innerText = high;
 
-    draw(){
-        ctx.fillStyle = types[this.type].color;
-        ctx.fillRect(this.x,this.y,60,60);
+// Dodaj licznik czasu jeśli nie istnieje
+const ui = document.getElementById("ui");
+ui.innerHTML += ` | Czas: <span id="time">0.0</span>s`;
+
+for(let r = 0; r < rows; r++){
+    for(let c = 0; c < cols; c++){
+
+        enemies.push({
+            x: 100 + c * 70,
+            y: 50 + r * 60,
+            hp: 2
+        });
+
     }
 }
 
-// ➕ start 2 maszyny
-machines.push(new Machine(200,200,"basic"));
-machines.push(new Machine(300,200,"iron"));
+document.addEventListener("mousemove",(e)=>{
 
-// 💰 kupno
-function buyMachine(type){
+    player.x = e.offsetX;
 
-    let cost =
-        type==="basic"?100:
-        type==="iron"?300:800;
+    if(player.x < 0) player.x = 0;
+    if(player.x > 960) player.x = 960;
 
-    if(money >= cost){
+});
 
-        money -= cost;
+document.addEventListener("click",()=>{
 
-        machines.push(
-            new Machine(200 + machines.length*70,200,type)
-        );
-    }
-}
+    if(gameWon) return;
 
-// ⚡ speed
-function upgradeSpeed(){
-    if(money >= 200){
-        money -= 200;
-        speed += 0.5;
-    }
-}
+    bullets.push({
+        x: player.x + 20,
+        y: player.y,
+        v: 7
+    });
 
-// klik = kasa
-canvas.addEventListener("click",()=>{
-    money += 2;
 });
 
 function update(){
 
-    machines.forEach(m=>m.update());
+    bullets.forEach(b=>{
+        b.y -= b.v;
+    });
 
-    for(let i=0;i<items.length;i++){
+    bullets = bullets.filter(b => b.y > -20);
 
-        items[i].x += items[i].vx;
+    for(let i = enemies.length - 1; i >= 0; i--){
 
-        if(items[i].x > 1050){
+        for(let j = bullets.length - 1; j >= 0; j--){
 
-            money += items[i].value;
-            total += items[i].value;
+            let e = enemies[i];
+            let b = bullets[j];
 
-            items.splice(i,1);
-            i--;
+            if(
+                b.x > e.x &&
+                b.x < e.x + 40 &&
+                b.y > e.y &&
+                b.y < e.y + 40
+            ){
+
+                e.hp--;
+
+                bullets.splice(j,1);
+
+                if(e.hp <= 0){
+
+                    enemies.splice(i,1);
+
+                    score += 10;
+                }
+
+                break;
+            }
         }
     }
 
-    document.getElementById("money").innerText =
-        Math.floor(money);
+    if(score > high){
 
-    document.getElementById("total").innerText =
-        Math.floor(total);
+        high = score;
+
+        localStorage.setItem("hs", high);
+    }
+
+    document.getElementById("score").innerText = score;
+    document.getElementById("hs").innerText = high;
+    document.getElementById("lives").innerText = lives;
+
+    if(!gameWon){
+
+        let time =
+        ((Date.now() - startTime) / 1000).toFixed(1);
+
+        document.getElementById("time").innerText = time;
+    }
+
+    // WYGRANA
+    if(enemies.length === 0 && !gameWon){
+
+        gameWon = true;
+
+        let finalTime =
+        ((Date.now() - startTime) / 1000).toFixed(1);
+
+        setTimeout(()=>{
+
+            document.body.innerHTML = `
+            <div style="
+                color:white;
+                text-align:center;
+                margin-top:100px;
+                font-family:Arial;
+            ">
+                <h1>🏆 WYGRAŁEŚ!</h1>
+
+                <h2>⏱️ Czas: ${finalTime}s</h2>
+
+                <h2>⭐ Wynik: ${score}</h2>
+
+                <button
+                onclick="location.reload()"
+                style="
+                    padding:15px 30px;
+                    font-size:24px;
+                    cursor:pointer;
+                    border:none;
+                    border-radius:10px;
+                ">
+                    🔄 Restart
+                </button>
+            </div>
+            `;
+
+        },100);
+    }
 }
 
 function draw(){
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0,0,1000,600);
 
-    // taśma
-    ctx.fillStyle="#1f2937";
-    ctx.fillRect(50,250,1000,60);
+    // Gracz
+    ctx.fillStyle = "cyan";
+    ctx.fillRect(
+        player.x,
+        player.y,
+        player.w,
+        player.h
+    );
 
-    // ruch
-    ctx.fillStyle="#334155";
-    for(let x=60;x<1000;x+=40){
-        ctx.fillRect(x,275,20,10);
-    }
+    // Pociski
+    ctx.fillStyle = "yellow";
 
-    // maszyny
-    machines.forEach(m=>m.draw());
+    bullets.forEach(b=>{
 
-    // itemy (DUŻE I WIDOCZNE)
-    items.forEach(it=>{
-        ctx.fillStyle = it.color;
-        ctx.beginPath();
-        ctx.arc(it.x,it.y,10,0,Math.PI*2);
-        ctx.fill();
+        ctx.fillRect(
+            b.x,
+            b.y,
+            4,
+            10
+        );
+
+    });
+
+    // Przeciwnicy
+    enemies.forEach(e=>{
+
+        ctx.fillStyle =
+        e.hp === 2 ? "red" : "orange";
+
+        ctx.fillRect(
+            e.x,
+            e.y,
+            40,
+            40
+        );
+
     });
 }
 
 function loop(){
+
+    if(gameWon) return;
+
     update();
     draw();
+
     requestAnimationFrame(loop);
 }
 
