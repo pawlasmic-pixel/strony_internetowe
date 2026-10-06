@@ -1,31 +1,36 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karta Gracza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteczka</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="player-card">
-    <header class="card-heard">
-        <h1>Karta Gracza</h1>
-        <p>Nick: bot_lomot</p>
-        <p>Gra: TSB</p>
-    <!-- TODO: dodaj sekcje karty gracza -->
-    </header>
-    <section class="card-section bio">
-        <h2>Bio</h2>
-        <p>Pozimo: ultar skil</p>
-        <p>Klasa: Monster Form</p>
-        <p>Ilosc Kili: 1660</p>
-    </section>
-        <section class="card-section bio">
-        <h2>osiongniencia</h2>
-        <p>cosmic garu</p>
-        <p>nic</p>
-        <p>nic</p>
-    </section>
-  </main>
+  <div class="menu">
+    <h1>Biblioteczka</h1>
+    <div id="lista"></div>
+  </div>
+
+  <script src="teksty.js" charset="UTF-8"></script>
+  <script>
+    // Pisane w starym JavaScripcie (var, function), bo przeglądarki czytników są proste
+    function wczytajPostep(id) {
+      try { return localStorage.getItem("postep_" + id); } catch (e) { return null; }
+    }
+
+    var lista = document.getElementById("lista");
+    var html = "";
+    for (var i = 0; i < TEKSTY.length; i++) {
+      var t = TEKSTY[i];
+      var postep = wczytajPostep(t.id);
+      html += '<a class="pozycja" href="czytaj.html?id=' + t.id + '">' +
+                '<div class="tytul">' + t.tytul + '</div>' +
+                '<div class="opis">' + t.opis + '</div>' +
+                (postep ? '<div class="postep">Czytasz: ' + postep + '</div>' : '') +
+              '</a>';
+    }
+    lista.innerHTML = html;
+  </script>
 </body>
 </html>
