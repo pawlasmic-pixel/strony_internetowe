@@ -215,11 +215,19 @@ function start() {
 
   if (tekst.typ === "ksiazka") {
     strona.innerHTML = "<p>Wczytywanie książki...</p>";
-    var skrypt = document.createElement("script");
-    skrypt.charset = "UTF-8";
-    skrypt.src = tekst.plik; // plik woła wczytanoKsiazke([...])
-    skrypt.onerror = function () { strona.innerHTML = "<p>Nie udało się wczytać książki.</p>"; };
-    document.body.appendChild(skrypt);
+    // Najpierw szukamy w folderze (np. ksiazki/szatan.js), a jak nie ma - obok strony (szatan.js)
+    var sciezki = [tekst.plik, tekst.plik.split("/").pop()];
+    var wczytajSkrypt = function (i) {
+      var skrypt = document.createElement("script");
+      skrypt.charset = "UTF-8";
+      skrypt.src = sciezki[i]; // plik woła wczytanoKsiazke([...])
+      skrypt.onerror = function () {
+        if (i + 1 < sciezki.length) wczytajSkrypt(i + 1);
+        else strona.innerHTML = "<p>Nie udało się wczytać książki.</p>";
+      };
+      document.body.appendChild(skrypt);
+    };
+    wczytajSkrypt(0);
   } else if (tekst.typ === "komiks") {
     wczytanoKsiazke([{ tytul: tekst.tytul, akapity: [] }]);
   } else {
