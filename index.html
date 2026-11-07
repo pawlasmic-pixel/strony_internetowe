@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CleanClient</title>
-<meta name="description" content="CleanClient – mod do Minecraft 1.21.11 (Fabric). Pobierz i zgłoś problem.">
+<meta name="description" content="CleanClient – mod do Minecraft 1.21.9 – 1.21.11 (Fabric). Ponad 100 modułów, ClickGUI i HUD.">
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -140,7 +140,7 @@
     <a class="btn btn-ghost" href="#moduly">Zobacz moduły</a>
   </div>
   <div class="badges">
-    <span class="badge">Minecraft <b>1.21.11</b></span>
+    <span class="badge">Minecraft <b>1.21.9 – 1.21.11</b></span>
     <span class="badge">Fabric <b>0.16+</b></span>
     <span class="badge">Wymaga <b>Fabric API</b></span>
     <span class="badge">Java <b>21</b></span>
@@ -166,30 +166,31 @@
   <div class="wrap">
     <div class="head">
       <h2>Pobierz</h2>
-      <p>Jeden plik .jar, wrzucasz do folderu mods i gotowe.</p>
+      <p>Wybierz swoją wersję Minecrafta. Każda wersja ma własny plik .jar.</p>
     </div>
+    <div class="tabs" id="mcTabs"></div>
     <div class="dl">
       <div>
-        <h3>CleanClient <span id="verTitle">1.0.0</span></h3>
+        <h3>CleanClient <span id="verTitle">1.0.0</span> <span style="color:var(--muted);font-weight:600">dla <span class="mc">1.21.11</span></span></h3>
         <dl class="meta">
-          <dt>Minecraft</dt><dd>1.21.11</dd>
+          <dt>Minecraft</dt><dd class="mc">1.21.11</dd>
           <dt>Loader</dt><dd>Fabric Loader 0.16+ i Fabric API</dd>
           <dt>Java</dt><dd>21 lub nowsza</dd>
-          <dt>Rozmiar</dt><dd>ok. 365 KB</dd>
+          <dt>Rozmiar</dt><dd>ok. 370 KB</dd>
         </dl>
         <div class="req">
           <b>⚠ Wymagane: Fabric API</b>
-          Bez Fabric API mod się nie uruchomi. Pobierz wersję dla 1.21.11 i wrzuć ją do folderu <code>mods</code> razem z CleanClientem.
-          <a href="https://modrinth.com/mod/fabric-api/versions?g=1.21.11" target="_blank" rel="noopener">Pobierz Fabric API →</a>
+          Bez Fabric API mod się nie uruchomi. Pobierz wersję dla <span class="mc">1.21.11</span> i wrzuć ją do folderu <code>mods</code> razem z CleanClientem.
+          <a class="fapi" href="https://modrinth.com/mod/fabric-api/versions?g=1.21.11" target="_blank" rel="noopener">Pobierz Fabric API →</a>
         </div>
-        <a class="btn btn-main" id="dlBtn" href="pobierz/cleanclient-1.0.0.jar" download>
+        <a class="btn btn-main" id="dlBtn" href="pobierz/cleanclient-1.21.11.jar" download>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>
-          Pobierz .jar
+          Pobierz dla <span class="mc">1.21.11</span>
         </a>
       </div>
       <ol class="steps">
-        <li>Zainstaluj <b>Fabric Loader</b> dla wersji <b>1.21.11</b>.</li>
-        <li>Pobierz <b>Fabric API</b> dla 1.21.11 (<a href="https://modrinth.com/mod/fabric-api/versions?g=1.21.11" target="_blank" rel="noopener" style="color:var(--cyan)">Modrinth</a>), bez niego mod nie wystartuje.</li>
+        <li>Zainstaluj <b>Fabric Loader</b> dla wersji <b class="mc">1.21.11</b>.</li>
+        <li>Pobierz <b>Fabric API</b> dla <span class="mc">1.21.11</span> (<a class="fapi" href="https://modrinth.com/mod/fabric-api/versions?g=1.21.11" target="_blank" rel="noopener" style="color:var(--cyan)">Modrinth</a>), bez niego mod nie wystartuje.</li>
         <li>Wrzuć oba pliki .jar do <code>%appdata%\.minecraft\mods</code>.</li>
         <li>Uruchom grę profilem Fabric i wciśnij <b>prawy Alt</b>, żeby otworzyć ClickGUI.</li>
       </ol>
@@ -205,7 +206,8 @@
 /* ===== KONFIGURACJA ===== */
 const CONFIG = {
   wersja: "1.0.0",
-  plik: "pobierz/cleanclient-1.0.0.jar"
+  // Obsługiwane wersje Minecrafta, od najnowszej. Plik: pobierz/cleanclient-<wersja>.jar
+  mc: ["1.21.11", "1.21.10", "1.21.9"]
 };
 
 const MODULES = {
@@ -223,11 +225,28 @@ const all = Object.entries(MODULES).flatMap(([c,l]) => l.map(n => ({n,c})));
 
 // wersja
 ["verBadge","verTitle"].forEach(id => $(id).textContent = CONFIG.wersja);
-$("dlBtn").href = CONFIG.plik;
+
+// wybór wersji Minecrafta
+let mc = CONFIG.mc[0];
+try { if (CONFIG.mc.includes(localStorage.getItem("cc_mc"))) mc = localStorage.getItem("cc_mc"); } catch {}
+function renderMc(){
+  $("mcTabs").innerHTML = CONFIG.mc.map(v =>
+    `<button class="tab${v===mc?" on":""}" data-v="${v}">${v}</button>`).join("");
+  document.querySelectorAll(".mc").forEach(el => el.textContent = mc);
+  document.querySelectorAll(".fapi").forEach(a => a.href = "https://modrinth.com/mod/fabric-api/versions?g=" + mc);
+  $("dlBtn").href = `pobierz/cleanclient-${mc}.jar`;
+}
+$("mcTabs").onclick = e => {
+  const b = e.target.closest(".tab"); if(!b) return;
+  mc = b.dataset.v;
+  try { localStorage.setItem("cc_mc", mc); } catch {}
+  renderMc();
+};
+renderMc();
 
 // statystyki
 $("stats").innerHTML = [
-  [all.length,"modułów"],[Object.keys(MODULES).length,"kategorii"],["1.21.11","Minecraft"],["Fabric","loader"]
+  [all.length,"modułów"],[Object.keys(MODULES).length,"kategorii"],[CONFIG.mc.length,"wersje Minecrafta"],["Fabric","loader"]
 ].map(([b,s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
 
 // zakładki + lista
